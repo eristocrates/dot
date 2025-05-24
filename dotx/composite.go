@@ -195,6 +195,7 @@ func ConvertExternalToSameGraph(root *Composite, newGraph *dot.Graph) *dot.Graph
 		// Create cluster for this composite
 		cluster := parentGraph.Subgraph(comp.outerNode.ID(), dot.ClusterOption{})
 		cluster.Attr("label", comp.outerNode.ID())
+		cluster.Attr("fillcolor", "white")
 
 		// Create new node map for this cluster
 		clusterNodeMap := make(map[string]dot.Node)
