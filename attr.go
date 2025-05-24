@@ -20,21 +20,21 @@ type AttributesMap struct {
 	attributes map[string]interface{}
 }
 
-// Attrs sets multiple values for attributes (unless empty) taking a label,value list
-// E.g  Attrs("style","filled","fillcolor","red")
-func (a AttributesMap) Attrs(labelvalues ...interface{}) {
+// SetAttributes sets multiple values for attributes (unless empty) taking a label,value list
+// E.g  SetAttributes("style","filled","fillcolor","red")
+func (a AttributesMap) SetAttributes(labelvalues ...interface{}) {
 	if len(labelvalues)%2 != 0 {
 		panic("missing label or value ; must provide pairs")
 	}
 	for i := 0; i < len(labelvalues); i += 2 {
 		label := labelvalues[i].(string)
 		value := labelvalues[i+1]
-		a.Attr(label, value)
+		a.SetAttribute(label, value)
 	}
 }
 
-// Attr sets the value for an attribute (unless empty).
-func (a AttributesMap) Attr(label string, value interface{}) {
+// SetAttribute sets the value for an attribute (unless empty).
+func (a AttributesMap) SetAttribute(label string, value interface{}) {
 	if len(label) == 0 || value == nil {
 		return
 	}

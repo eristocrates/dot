@@ -66,7 +66,7 @@ func (g *Graph) SetID(newID string) *Graph {
 
 // Label sets the "label" attribute value.
 func (g *Graph) Label(label string) *Graph {
-	g.AttributesMap.Attr("label", label)
+	g.AttributesMap.SetAttribute("label", label)
 	return g
 }
 
@@ -117,7 +117,7 @@ func (g *Graph) Subgraph(id string, options ...GraphOption) *Graph {
 		return sub
 	}
 	sub = NewGraph(Sub)
-	sub.Attr("label", id) // for consistency with Node creation behavior.
+	sub.SetAttribute("label", id) // for consistency with Node creation behavior.
 	sub.id = fmt.Sprintf("s%d", g.nextSeq())
 	for _, each := range options {
 		each.Apply(sub)

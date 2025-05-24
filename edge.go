@@ -10,14 +10,14 @@ type Edge struct {
 
 // SetAttribute sets key=value and returns the Edge.
 func (e Edge) SetAttribute(key string, value interface{}) Edge {
-	e.AttributesMap.Attr(key, value)
+	e.AttributesMap.SetAttribute(key, value)
 	return e
 }
 
 // Label sets "label"=value and returns the Edge.
 // Same as Attr("label",value)
 func (e Edge) Label(value interface{}) Edge {
-	e.AttributesMap.Attr("label", value)
+	e.AttributesMap.SetAttribute("label", value)
 	return e
 }
 

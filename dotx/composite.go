@@ -194,8 +194,8 @@ func ConvertExternalToSameGraph(root *Composite, newGraph *dot.Graph) *dot.Graph
 	processComposite = func(comp *Composite, parentGraph *dot.Graph, parentNodeMap map[string]dot.Node) {
 		// Create cluster for this composite
 		cluster := parentGraph.Subgraph(comp.outerNode.ID(), dot.ClusterOption{})
-		cluster.Attr("label", comp.outerNode.ID())
-		cluster.Attr("fillcolor", "white")
+		cluster.SetAttribute("label", comp.outerNode.ID())
+		cluster.SetAttribute("fillcolor", "white")
 
 		// Create new node map for this cluster
 		clusterNodeMap := make(map[string]dot.Node)
@@ -270,14 +270,14 @@ func findChildComposites(comp *Composite) []*Composite {
 
 		// Derive the .dot filename from the href (which is an SVG file)
 		// e.g. "child_composite.svg" -> "child_composite.dot"
-		dotFile := strings.TrimSuffix(href, ".svg") + ".dot"
+		// dotFile := strings.TrimSuffix(href, ".svg") + ".dot"
 		dotPath := comp.dotFilename // full path of current composite's dot file
-		dir := filepath.Dir(dotPath)
-		fullDotPath := filepath.Join(dir, dotFile)
+		// dir := filepath.Dir(dotPath)
+		// fullDotPath := filepath.Join(dir, dotFile)
 
 		// Create a new Composite for the child
 		// Use ExternalGraph kind because child composites are external graphs linked by href
-		child := NewComposite(fullDotPath, node.ID(), comp.Graph, ExternalGraph)
+		child := NewComposite(dotPath, node.ID(), comp.Graph, SameGraph)
 
 		// Optionally, you could load or parse the child's graph here if needed
 		// but for now just create the Composite wrapper

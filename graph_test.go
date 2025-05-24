@@ -48,8 +48,8 @@ func TestOverrideID(t *testing.T) {
 func TestEmptyWithIDAndAttributes(t *testing.T) {
 	di := NewGraph(Directed)
 	di.SetID("test")
-	di.Attr("style", "filled")
-	di.Attr("color", "lightgrey")
+	di.SetAttribute("style", "filled")
+	di.SetAttribute("color", "lightgrey")
 	if got, want := flatten(di.String()), `digraph test {color="lightgrey";style="filled";}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
@@ -58,7 +58,7 @@ func TestEmptyWithIDAndAttributes(t *testing.T) {
 func TestEmptyWithHTMLLabel(t *testing.T) {
 	di := NewGraph(Directed)
 	di.SetID("test")
-	di.Attr("label", HTML("<B>Hi</B>"))
+	di.SetAttribute("label", HTML("<B>Hi</B>"))
 	if got, want := flatten(di.String()), `digraph test {label=<<B>Hi</B>>;}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
@@ -95,7 +95,7 @@ func TestDeleteNodeWhenNodeDoesNotExist(t *testing.T) {
 func TestEmptyWithLiteralValueLabel(t *testing.T) {
 	di := NewGraph(Directed)
 	di.SetID("test")
-	di.Attr("label", Literal(`"left-justified text\l"`))
+	di.SetAttribute("label", Literal(`"left-justified text\l"`))
 	if got, want := flatten(di.String()), `digraph test {label="left-justified text\l";}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
@@ -137,7 +137,7 @@ func TestSubgraph(t *testing.T) {
 	if second := di.Subgraph("test-id"); second != sub {
 		t.Fatal()
 	}
-	sub.Attr("style", "filled")
+	sub.SetAttribute("style", "filled")
 	if got, want := flatten(di.String()), `digraph  {subgraph s1 {label="test-id";style="filled";}}`; got != want {
 		t.Errorf("got\n[%v] want\n[%v]", got, want)
 	}
@@ -431,7 +431,7 @@ func TestNodeGetAttributesCopy(t *testing.T) {
 func TestDeepCopy(t *testing.T) {
 	g := NewGraph(Directed)
 	g.SetID("original")
-	g.Attr("color", "blue")
+	g.SetAttribute("color", "blue")
 
 	n1 := g.Node("A").SetAttribute("label", "Node A")
 	n2 := g.Node("B").SetAttribute("label", "Node B")

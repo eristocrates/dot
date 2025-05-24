@@ -13,7 +13,7 @@ func (n Node) ID() string { return n.id }
 
 // SetAttribute sets label=value and return the Node
 func (n Node) SetAttribute(label string, value interface{}) Node {
-	n.AttributesMap.Attr(label, value)
+	n.AttributesMap.SetAttribute(label, value)
 	return n
 }
 
