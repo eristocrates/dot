@@ -40,7 +40,7 @@
 ## v1.3.0 - 2023-02-21
 
 - Escape/quote mermaid
-- add FindNodeWithLabel 
+- add FindNodeWithLabel
 
 ## v1.2.0 - 2022-11-18
 
@@ -52,11 +52,11 @@
 
 ## v1.0.0 - 2022-06-22
 
-- add support for port, see https://github.com/emicklei/dot/pull/25 (thx v-electrolux)
+- add support for port, see <https://github.com/eristocrates/dot/pull/25> (thx v-electrolux)
 
 ## v0.16.0 - 2021-05-04
 
-- add DeleteNote, see https://github.com/emicklei/dot/pull/24
+- add DeleteNote, see <https://github.com/eristocrates/dot/pull/24>
 
 ## v0.15.0 - 2020-10-30
 
@@ -80,7 +80,7 @@
 - add functionality to find node by id
 - add function to find all nodes of a graph
 
-## v0.10.2 - 2020-01-31 
+## v0.10.2 - 2020-01-31
 
 - Fix indexing subgraphs by label ; must use id. Issue #16
 - Add Label(newLabel) to Graph

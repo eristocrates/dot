@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/emicklei/dot"
+	"github.com/eristocrates/dot"
 )
 
 func TestExampleSubsystemSameGraph(t *testing.T) {

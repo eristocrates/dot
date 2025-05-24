@@ -1,3 +1,3 @@
-module github.com/emicklei/dot
+module github.com/eristocrates/dot
 
-go 1.13
+go 1.24.2

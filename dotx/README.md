@@ -4,7 +4,7 @@ This package contains utilities to create graphs on top of the `emicklei/dot pac
 
 ### Composite
 
-The `Composite` type can be used to create composition hierarchies like clustering. 
+The `Composite` type can be used to create composition hierarchies like clustering.
 
 Let's examine this diagram.
 
@@ -37,8 +37,8 @@ See `subsystem_test.go` for the code of these examples.
 ### usage pattern
 
     import (
-        "github.com/emicklei/dot"
-        "github.com/emicklei/dot/dotx"
+        "github.com/eristocrates/dot"
+        "github.com/eristocrates/dot/dotx"
     )
 
     func YourService(parent *dot.Graph) *dotx.Composite {

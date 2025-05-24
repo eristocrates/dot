@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/emicklei/dot"
+	"github.com/eristocrates/dot"
 )
 
 type compositeGraphKind int
@@ -34,7 +34,7 @@ type Composite struct {
 
 // NewComposite creates a Composite abstraction that is represented as a Node (box3d shape) in the graph.
 // The kind determines whether the graph of the composite is embedded (same graph) or external.
-func NewComposite(id string, g *dot.Graph, kind compositeGraphKind) *Composite {
+func NewComposite(dotPath, id string, g *dot.Graph, kind compositeGraphKind) *Composite {
 	var innerGraph *dot.Graph
 	if kind == SameGraph {
 		innerGraph = g.Subgraph(id, dot.ClusterOption{})
@@ -47,7 +47,7 @@ func NewComposite(id string, g *dot.Graph, kind compositeGraphKind) *Composite {
 		outerGraph: g,
 		kind:       kind,
 	}
-	sub.ExportName(id)
+	sub.ExportName(dotPath, id)
 	return sub
 }
 
@@ -63,11 +63,11 @@ func (s *Composite) Attr(label string, value interface{}) dot.Node {
 
 // ExportName argument name will be used for the .dot export and the HREF link using svg
 // So if name = "my example" then export will create "my_example.dot" and the link will be "my_example.svg"
-func (s *Composite) ExportName(name string) {
+func (s *Composite) ExportName(dotPath, name string) {
 	hrefFile := strings.ReplaceAll(name, " ", "_") + ".svg"
 	dotFile := strings.ReplaceAll(name, " ", "_") + ".dot"
 	s.outerNode.Attr("href", hrefFile)
-	s.dotFilename = dotFile
+	s.dotFilename = dotPath + dotFile
 }
 
 // Input creates an edge.
@@ -142,4 +142,116 @@ func (s *Composite) Export(build func(g *dot.Graph)) *Composite {
 		log.Println("WARN: dotx.Composite.Export failed", err)
 	}
 	return s
+}
+
+// ConvertExternalToSameGraph takes a root composite and converts it to same-graph format
+func ConvertExternalToSameGraph(root *Composite, newGraph *dot.Graph) *dot.Graph {
+	// Create new root graph
+	// newGraph := dot.NewGraph(dot.Directed)
+
+	// Create a mapping of original nodes to new nodes
+	nodeMap := make(map[string]dot.Node)
+
+	// Copy all nodes from the root graph first
+	for _, node := range root.outerGraph.FindNodes() {
+		newNode := newGraph.Node(node.ID())
+		copyAttributes(node, newNode)
+		nodeMap[node.ID()] = newNode
+	}
+
+	// Now find and copy all edges by checking all node pairs
+	nodes := root.outerGraph.FindNodes()
+	for i, fromNode := range nodes {
+		for _, toNode := range nodes[i+1:] {
+			// Check edges in both directions
+			edges := root.outerGraph.FindEdges(fromNode, toNode)
+			for _, edge := range edges {
+				newEdge := newGraph.Edge(nodeMap[edge.From().ID()], nodeMap[edge.To().ID()])
+				copyAttributes(edge, newEdge)
+			}
+
+			// Check reverse direction
+			edges = root.outerGraph.FindEdges(toNode, fromNode)
+			for _, edge := range edges {
+				newEdge := newGraph.Edge(nodeMap[edge.From().ID()], nodeMap[edge.To().ID()])
+				copyAttributes(edge, newEdge)
+			}
+		}
+	}
+
+	// Recursively process composites
+	var processComposite func(comp *Composite, parentGraph *dot.Graph, parentNodeMap map[string]dot.Node)
+	processComposite = func(comp *Composite, parentGraph *dot.Graph, parentNodeMap map[string]dot.Node) {
+		// Create cluster for this composite
+		cluster := parentGraph.Subgraph(comp.outerNode.ID(), dot.ClusterOption{})
+		cluster.Attr("label", comp.outerNode.ID())
+		cluster.Attr("style", "filled")
+		cluster.Attr("fillcolor", "lightgrey")
+
+		// Create new node map for this cluster
+		clusterNodeMap := make(map[string]dot.Node)
+
+		// Copy all nodes from composite's inner graph
+		for _, node := range comp.Graph.FindNodes() {
+			newNode := cluster.Node(node.ID())
+			copyAttributes(node, newNode)
+			clusterNodeMap[node.ID()] = newNode
+		}
+
+		// Copy all edges from composite's inner graph
+		compNodes := comp.Graph.FindNodes()
+		for i, fromNode := range compNodes {
+			for _, toNode := range compNodes[i+1:] {
+				// Check edges in both directions
+				edges := comp.Graph.FindEdges(fromNode, toNode)
+				for _, edge := range edges {
+					newEdge := cluster.Edge(clusterNodeMap[edge.From().ID()], clusterNodeMap[edge.To().ID()])
+					copyAttributes(edge, newEdge)
+				}
+
+				// Check reverse direction
+				edges = comp.Graph.FindEdges(toNode, fromNode)
+				for _, edge := range edges {
+					newEdge := cluster.Edge(clusterNodeMap[edge.From().ID()], clusterNodeMap[edge.To().ID()])
+					copyAttributes(edge, newEdge)
+				}
+			}
+		}
+
+		// Process child composites
+		for _, child := range findChildComposites(comp) {
+			processComposite(child, cluster, clusterNodeMap)
+		}
+	}
+
+	// Start processing from root composite
+	processComposite(root, newGraph, nodeMap)
+
+	return newGraph
+}
+
+// Helper function to copy attributes
+func copyAttributes(from interface{}, to interface{}) {
+	switch src := from.(type) {
+	case dot.Node:
+		if dst, ok := to.(dot.Node); ok {
+			for key, value := range src.GetAttributes() {
+				dst.Attr(key, value)
+			}
+		}
+	case dot.Edge:
+		if dst, ok := to.(dot.Edge); ok {
+			for key, value := range src.GetAttributes() {
+				dst.Attr(key, value)
+			}
+		}
+	}
+}
+
+// Find child composites by looking for nodes with href attributes
+func findChildComposites(comp *Composite) []*Composite {
+	var children []*Composite
+	// This would need access to your composite registry
+	// For now returns empty - you'll need to implement based on your setup
+	return children
 }

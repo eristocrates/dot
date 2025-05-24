@@ -11,15 +11,19 @@ import (
 // Graph represents a dot graph with nodes and edges.
 type Graph struct {
 	AttributesMap
-	id        string
-	isStrict  bool
-	graphType string
-	seq       int
-	nodes     map[string]Node
-	edgesFrom map[string][]Edge
-	subgraphs map[string]*Graph
-	parent    *Graph
-	sameRank  map[string][]Node
+	id          string
+	isStrict    bool
+	graphType   string
+	seq         int
+	nodes       map[string]Node
+	edgesFrom   map[string][]Edge
+	subgraphs   map[string]*Graph
+	parent      *Graph
+	sameRanks   map[string][]Node
+	minRanks    map[string][]Node
+	sourceRanks map[string][]Node
+	maxRanks    map[string][]Node
+	sinkRanks   map[string][]Node
 	//
 	nodeInitializer func(Node)
 	edgeInitializer func(Edge)
@@ -34,7 +38,11 @@ func NewGraph(options ...GraphOption) *Graph {
 		nodes:         map[string]Node{},
 		edgesFrom:     map[string][]Edge{},
 		subgraphs:     map[string]*Graph{},
-		sameRank:      map[string][]Node{},
+		sameRanks:     map[string][]Node{},
+		minRanks:      map[string][]Node{},
+		sourceRanks:   map[string][]Node{},
+		maxRanks:      map[string][]Node{},
+		sinkRanks:     map[string][]Node{},
 	}
 	for _, each := range options {
 		each.Apply(graph)
@@ -253,8 +261,25 @@ func commonParentOf(one *Graph, two *Graph) *Graph {
 }
 
 // AddToSameRank adds the given nodes to the specified rank group, forcing them to be rendered in the same row
-func (g *Graph) AddToSameRank(group string, nodes ...Node) {
-	g.sameRank[group] = append(g.sameRank[group], nodes...)
+func (g *Graph) AddToSameRank(nodes ...Node) {
+	group := "same"
+	g.sameRanks[group] = append(g.sameRanks[group], nodes...)
+}
+func (g *Graph) AddToMinRank(nodes ...Node) {
+	group := "min"
+	g.minRanks[group] = append(g.minRanks[group], nodes...)
+}
+func (g *Graph) AddToSourceRank(nodes ...Node) {
+	group := "source"
+	g.sourceRanks[group] = append(g.sourceRanks[group], nodes...)
+}
+func (g *Graph) AddToMaxRank(nodes ...Node) {
+	group := "max"
+	g.maxRanks[group] = append(g.maxRanks[group], nodes...)
+}
+func (g *Graph) AddToSinkRank(nodes ...Node) {
+	group := "sink"
+	g.sinkRanks[group] = append(g.sinkRanks[group], nodes...)
 }
 
 // String returns the source in dot notation.
@@ -313,12 +338,44 @@ func (g *Graph) IndentedWrite(w *IndentWriter) {
 				w.NewLine()
 			}
 		}
-		for _, nodes := range g.sameRank {
+		for _, nodes := range g.sameRanks {
 			str := ""
 			for _, n := range nodes {
 				str += fmt.Sprintf("n%d;", n.seq)
 			}
 			fmt.Fprintf(w, "{rank=same; %s};", str)
+			w.NewLine()
+		}
+		for _, nodes := range g.minRanks {
+			str := ""
+			for _, n := range nodes {
+				str += fmt.Sprintf("n%d;", n.seq)
+			}
+			fmt.Fprintf(w, "{rank=min; %s};", str)
+			w.NewLine()
+		}
+		for _, nodes := range g.sourceRanks {
+			str := ""
+			for _, n := range nodes {
+				str += fmt.Sprintf("n%d;", n.seq)
+			}
+			fmt.Fprintf(w, "{rank=source; %s};", str)
+			w.NewLine()
+		}
+		for _, nodes := range g.maxRanks {
+			str := ""
+			for _, n := range nodes {
+				str += fmt.Sprintf("n%d;", n.seq)
+			}
+			fmt.Fprintf(w, "{rank=max; %s};", str)
+			w.NewLine()
+		}
+		for _, nodes := range g.sinkRanks {
+			str := ""
+			for _, n := range nodes {
+				str += fmt.Sprintf("n%d;", n.seq)
+			}
+			fmt.Fprintf(w, "{rank=sink; %s};", str)
 			w.NewLine()
 		}
 	})
@@ -477,18 +534,70 @@ func (g *Graph) DeepCopy() *Graph {
 		copy.subgraphs[id] = newSubgraph
 	}
 
-	copy.sameRank = make(map[string][]Node, len(g.sameRank))
-	rankKeys := make([]string, 0, len(g.sameRank))
-	for rank := range g.sameRank {
-		rankKeys = append(rankKeys, rank)
+	copy.sameRanks = make(map[string][]Node, len(g.sameRanks))
+	sameRankKeys := make([]string, 0, len(g.sameRanks))
+	for sameRank := range g.sameRanks {
+		sameRankKeys = append(sameRankKeys, sameRank)
 	}
-	sort.Strings(rankKeys)
-	for _, rank := range rankKeys {
-		newNodes := make([]Node, len(g.sameRank[rank]))
-		for i, node := range g.sameRank[rank] {
+	sort.Strings(sameRankKeys)
+	for _, rank := range sameRankKeys {
+		newNodes := make([]Node, len(g.sameRanks[rank]))
+		for i, node := range g.sameRanks[rank] {
 			newNodes[i] = copy.nodes[node.id]
 		}
-		copy.sameRank[rank] = newNodes
+		copy.sameRanks[rank] = newNodes
+	}
+	copy.minRanks = make(map[string][]Node, len(g.minRanks))
+	minRankKeys := make([]string, 0, len(g.minRanks))
+	for minRank := range g.minRanks {
+		minRankKeys = append(minRankKeys, minRank)
+	}
+	sort.Strings(minRankKeys)
+	for _, rank := range minRankKeys {
+		newNodes := make([]Node, len(g.minRanks[rank]))
+		for i, node := range g.minRanks[rank] {
+			newNodes[i] = copy.nodes[node.id]
+		}
+		copy.minRanks[rank] = newNodes
+	}
+	copy.sourceRanks = make(map[string][]Node, len(g.sourceRanks))
+	sourceRankKeys := make([]string, 0, len(g.sourceRanks))
+	for sourceRank := range g.sourceRanks {
+		sourceRankKeys = append(sourceRankKeys, sourceRank)
+	}
+	sort.Strings(sourceRankKeys)
+	for _, rank := range sourceRankKeys {
+		newNodes := make([]Node, len(g.sourceRanks[rank]))
+		for i, node := range g.sourceRanks[rank] {
+			newNodes[i] = copy.nodes[node.id]
+		}
+		copy.sourceRanks[rank] = newNodes
+	}
+	copy.maxRanks = make(map[string][]Node, len(g.maxRanks))
+	maxRankKeys := make([]string, 0, len(g.maxRanks))
+	for maxRank := range g.maxRanks {
+		maxRankKeys = append(maxRankKeys, maxRank)
+	}
+	sort.Strings(maxRankKeys)
+	for _, rank := range maxRankKeys {
+		newNodes := make([]Node, len(g.maxRanks[rank]))
+		for i, node := range g.maxRanks[rank] {
+			newNodes[i] = copy.nodes[node.id]
+		}
+		copy.maxRanks[rank] = newNodes
+	}
+	copy.sinkRanks = make(map[string][]Node, len(g.sinkRanks))
+	sinkRankKeys := make([]string, 0, len(g.sinkRanks))
+	for sinkRank := range g.sinkRanks {
+		sinkRankKeys = append(sinkRankKeys, sinkRank)
+	}
+	sort.Strings(sinkRankKeys)
+	for _, rank := range sinkRankKeys {
+		newNodes := make([]Node, len(g.sinkRanks[rank]))
+		for i, node := range g.sinkRanks[rank] {
+			newNodes[i] = copy.nodes[node.id]
+		}
+		copy.sinkRanks[rank] = newNodes
 	}
 
 	copy.nodeInitializer = g.nodeInitializer
