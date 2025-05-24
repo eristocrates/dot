@@ -257,10 +257,33 @@ func copyAttributes(from interface{}, to interface{}) {
 	}
 }
 
-// Find child composites by looking for nodes with href attributes
 func findChildComposites(comp *Composite) []*Composite {
 	var children []*Composite
-	// This would need access to your composite registry
-	// For now returns empty - you'll need to implement based on your setup
+
+	// Iterate over all nodes in the composite's inner graph
+	for _, node := range comp.Graph.FindNodes() {
+		attrs := node.GetAttributes()
+		href, ok := attrs["href"].(string)
+		if !ok || href == "" {
+			continue
+		}
+
+		// Derive the .dot filename from the href (which is an SVG file)
+		// e.g. "child_composite.svg" -> "child_composite.dot"
+		dotFile := strings.TrimSuffix(href, ".svg") + ".dot"
+		dotPath := comp.dotFilename // full path of current composite's dot file
+		dir := filepath.Dir(dotPath)
+		fullDotPath := filepath.Join(dir, dotFile)
+
+		// Create a new Composite for the child
+		// Use ExternalGraph kind because child composites are external graphs linked by href
+		child := NewComposite(fullDotPath, node.ID(), comp.Graph, ExternalGraph)
+
+		// Optionally, you could load or parse the child's graph here if needed
+		// but for now just create the Composite wrapper
+
+		children = append(children, child)
+	}
+
 	return children
 }
