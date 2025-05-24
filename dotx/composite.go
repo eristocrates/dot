@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/eristocrates/dot"
@@ -130,7 +131,16 @@ func (s *Composite) ExportFile() error {
 	if s.kind != ExternalGraph {
 		return errors.New("ExportFile is only applicable to a ExternalGraph Composite")
 	}
-	return os.WriteFile(s.ExportFilename(), []byte(s.Graph.String()), os.ModePerm)
+
+	path := s.ExportFilename()
+	dirPath, _ := filepath.Split(path)
+	err := os.MkdirAll(dirPath, 0755)
+
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(path, []byte(s.Graph.String()), os.ModePerm)
 }
 
 // Export writes the DOT file for a Composite after building the content (child) graph using the build function.
