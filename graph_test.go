@@ -195,7 +195,7 @@ func TestSameRank(t *testing.T) {
 	bar := di.Node("bar")
 	foo1.Edge(foo2)
 	foo1.Edge(bar)
-	di.AddToSameRank("top-row", foo1, foo2)
+	di.AddToSameRank(foo1, foo2)
 	if got, want := flatten(di.String()), `digraph  {n3[label="bar"];n1[label="foo1"];n2[label="foo2"];n1->n2;n1->n3;{rank=same; n1;n2;};}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
@@ -443,7 +443,7 @@ func TestDeepCopy(t *testing.T) {
 	sub := g.Subgraph("sub1")
 	sub.Node("D").Attr("label", "Node D")
 
-	g.AddToSameRank("top-row", n1, n2, n3)
+	g.AddToSameRank(n1, n2, n3)
 
 	copy := g.DeepCopy()
 
@@ -505,17 +505,17 @@ func TestDeepCopy(t *testing.T) {
 		}
 	}
 
-	rankKeys := make([]string, 0, len(g.sameRank))
-	for rank := range g.sameRank {
+	rankKeys := make([]string, 0, len(g.sameRanks))
+	for rank := range g.sameRanks {
 		rankKeys = append(rankKeys, rank)
 	}
 	sort.Strings(rankKeys)
-	if len(copy.sameRank) != len(g.sameRank) {
-		t.Errorf("Expected sameRank groups to be copied")
+	if len(copy.sameRanks) != len(g.sameRanks) {
+		t.Errorf("Expected sameRanks groups to be copied")
 	}
 	for _, rank := range rankKeys {
-		originalNodes := g.sameRank[rank]
-		copiedNodes, exists := copy.sameRank[rank]
+		originalNodes := g.sameRanks[rank]
+		copiedNodes, exists := copy.sameRanks[rank]
 		if !exists {
 			t.Errorf("Same-rank group %v missing in copied graph", rank)
 		}
