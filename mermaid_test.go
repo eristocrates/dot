@@ -7,8 +7,8 @@ import (
 func TestMermaidSimple(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("e1").Label("E1")
-	n2 := di.Node("e2").Attr("shape", MermaidShapeRound).Attr("style", "fill:#90EE90")
-	n1.Edge(n2, "what").Attr("x", "y")
+	n2 := di.Node("e2").SetAttribute("shape", MermaidShapeRound).SetAttribute("style", "fill:#90EE90")
+	n1.Edge(n2, "what").SetAttribute("x", "y")
 	out := flatten(MermaidGraph(di, MermaidTopDown))
 	if got, want := out, `graph TD;n1("E1");n2("e2");style n2 fill:#90EE90n1-->|"what"|n2;`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
@@ -43,15 +43,15 @@ func TestEmptyGraphLR(t *testing.T) {
 }
 func TestMermaidShapes(t *testing.T) {
 	di := NewGraph(Directed)
-	di.Node("round").Attr("shape", MermaidShapeRound)
-	di.Node("asym").Attr("shape", MermaidShapeAsymmetric)
-	di.Node("circ").Attr("shape", MermaidShapeCircle)
-	di.Node("cyl").Attr("shape", MermaidShapeCylinder)
-	di.Node("rhom").Attr("shape", MermaidShapeRhombus)
-	di.Node("stad").Attr("shape", MermaidShapeStadium)
-	di.Node("sub").Attr("shape", MermaidShapeSubroutine)
-	di.Node("trap").Attr("shape", MermaidShapeTrapezoid)
-	di.Node("trapalt").Attr("shape", MermaidShapeTrapezoidAlt)
+	di.Node("round").SetAttribute("shape", MermaidShapeRound)
+	di.Node("asym").SetAttribute("shape", MermaidShapeAsymmetric)
+	di.Node("circ").SetAttribute("shape", MermaidShapeCircle)
+	di.Node("cyl").SetAttribute("shape", MermaidShapeCylinder)
+	di.Node("rhom").SetAttribute("shape", MermaidShapeRhombus)
+	di.Node("stad").SetAttribute("shape", MermaidShapeStadium)
+	di.Node("sub").SetAttribute("shape", MermaidShapeSubroutine)
+	di.Node("trap").SetAttribute("shape", MermaidShapeTrapezoid)
+	di.Node("trapalt").SetAttribute("shape", MermaidShapeTrapezoidAlt)
 	s := MermaidGraph(di, MermaidLeftToRight)
 	// t.Log(s)
 	if got, want := flatten(s), `graph LR;n2>"asym"];n3(("circ"));n4[("cyl")];n5{"rhom"};n1("round");n6(["stad"]);n7[["sub"]];n8[/"trap"\];n9[\"trapalt"/];`; got != want {
@@ -62,7 +62,7 @@ func TestMermaidShapes(t *testing.T) {
 // Deprecated: Use MermaidShapeCircle instead of MermaidShapeCirle
 func TestMermaidShapeCirle(t *testing.T) {
 	di := NewGraph(Directed)
-	di.Node("circ").Attr("shape", MermaidShapeCirle)
+	di.Node("circ").SetAttribute("shape", MermaidShapeCirle)
 	s := MermaidGraph(di, MermaidLeftToRight)
 	// t.Log(s)
 	if got, want := flatten(s), `graph LR;n1(("circ"));`; got != want {
@@ -82,7 +82,7 @@ func TestUndirectedMermaid(t *testing.T) {
 
 func TestNonStringLinkEdge(t *testing.T) {
 	un := NewGraph(Undirected)
-	un.Node("love").Edge(un.Node("happinez")).Attr("link", "---")
+	un.Node("love").Edge(un.Node("happinez")).SetAttribute("link", "---")
 	s := MermaidFlowchart(un, MermaidLeftToRight)
 	//t.Log(s)
 	if got, want := flatten(s), `flowchart LR;n2("happinez");n1("love");n1---n2;`; got != want {
@@ -92,7 +92,7 @@ func TestNonStringLinkEdge(t *testing.T) {
 
 func TestNonStringLabelEdge(t *testing.T) {
 	un := NewGraph(Undirected)
-	un.Node("love").Edge(un.Node("happinez")).Attr("label", true)
+	un.Node("love").Edge(un.Node("happinez")).SetAttribute("label", true)
 	s := MermaidFlowchart(un, MermaidLeftToRight)
 	//t.Log(s)
 	if got, want := flatten(s), `flowchart LR;n2("happinez");n1("love");n1---|"true"|n2;`; got != want {

@@ -35,11 +35,11 @@ func TestOverrideID(t *testing.T) {
 		}
 	}()
 	di := NewGraph(Directed)
-	di.ID("one")
-	if got, want := di.GetID(), "one"; got != want {
+	di.SetID("one")
+	if got, want := di.ID(), "one"; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
-	di.ID("two")
+	di.SetID("two")
 	if !caught {
 		t.Fail()
 	}
@@ -47,7 +47,7 @@ func TestOverrideID(t *testing.T) {
 
 func TestEmptyWithIDAndAttributes(t *testing.T) {
 	di := NewGraph(Directed)
-	di.ID("test")
+	di.SetID("test")
 	di.Attr("style", "filled")
 	di.Attr("color", "lightgrey")
 	if got, want := flatten(di.String()), `digraph test {color="lightgrey";style="filled";}`; got != want {
@@ -57,7 +57,7 @@ func TestEmptyWithIDAndAttributes(t *testing.T) {
 
 func TestEmptyWithHTMLLabel(t *testing.T) {
 	di := NewGraph(Directed)
-	di.ID("test")
+	di.SetID("test")
 	di.Attr("label", HTML("<B>Hi</B>"))
 	if got, want := flatten(di.String()), `digraph test {label=<<B>Hi</B>>;}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
@@ -94,7 +94,7 @@ func TestDeleteNodeWhenNodeDoesNotExist(t *testing.T) {
 
 func TestEmptyWithLiteralValueLabel(t *testing.T) {
 	di := NewGraph(Directed)
-	di.ID("test")
+	di.SetID("test")
 	di.Attr("label", Literal(`"left-justified text\l"`))
 	if got, want := flatten(di.String()), `digraph test {label="left-justified text\l";}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
@@ -182,7 +182,7 @@ func TestEdgeLabel(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("e1")
 	n2 := di.Node("e2")
-	n1.Edge(n2, "what").Attr("x", "y")
+	n1.Edge(n2, "what").SetAttribute("x", "y")
 	if got, want := flatten(di.String()), `digraph  {n1[label="e1"];n2[label="e2"];n1->n2[label="what",x="y"];}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
@@ -290,7 +290,7 @@ func TestGraph_FindNodes_multiNodesInSubGraphs(t *testing.T) {
 func TestLabelWithEscaping(t *testing.T) {
 	di := NewGraph(Directed)
 	n := di.Node("without linefeed")
-	n.Attr("label", Literal(`"with \l linefeed"`))
+	n.SetAttribute("label", Literal(`"with \l linefeed"`))
 	if got, want := flatten(di.String()), `digraph  {n1[label="with \l linefeed"];}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
@@ -299,7 +299,7 @@ func TestLabelWithEscaping(t *testing.T) {
 func TestGraphNodeInitializer(t *testing.T) {
 	di := NewGraph(Directed)
 	di.NodeInitializer(func(n Node) {
-		n.Attr("test", "test")
+		n.SetAttribute("test", "test")
 	})
 	n := di.Node("A")
 	if got, want := n.attributes["test"], "test"; got != want {
@@ -310,7 +310,7 @@ func TestGraphNodeInitializer(t *testing.T) {
 func TestGraphEdgeInitializer(t *testing.T) {
 	di := NewGraph(Directed)
 	di.EdgeInitializer(func(e Edge) {
-		e.Attr("test", "test")
+		e.SetAttribute("test", "test")
 	})
 	e := di.Node("A").Edge(di.Node("B"))
 	if got, want := e.attributes["test"], "test"; got != want {
@@ -398,7 +398,7 @@ func TestFindNodeWithLabel(t *testing.T) {
 	if !ok {
 		t.Fail()
 	}
-	if l := n1.GetAttr("label"); l != "B" {
+	if l := n1.Attribute("label"); l != "B" {
 		t.Fail()
 	}
 
@@ -406,7 +406,7 @@ func TestFindNodeWithLabel(t *testing.T) {
 	if !ok {
 		t.Fail()
 	}
-	if l := n2.GetAttr("label"); l != "A" {
+	if l := n2.Attribute("label"); l != "A" {
 		t.Fail()
 	}
 
@@ -419,10 +419,10 @@ func TestFindNodeWithLabel(t *testing.T) {
 func TestNodeGetAttributesCopy(t *testing.T) {
 	di := NewGraph(Directed)
 	n := di.Node("A")
-	n.Attr("foo", "bar")
-	attrs := n.GetAttributes()
+	n.SetAttribute("foo", "bar")
+	attrs := n.Attributes()
 	attrs["foo"] = "bar"
-	attrs2 := n.GetAttributes()
+	attrs2 := n.Attributes()
 	if v, ok := attrs2["foo"]; !ok || v != "bar" {
 		t.Errorf("expected foo=bar, got %v", attrs2)
 	}
@@ -430,25 +430,25 @@ func TestNodeGetAttributesCopy(t *testing.T) {
 
 func TestDeepCopy(t *testing.T) {
 	g := NewGraph(Directed)
-	g.ID("original")
+	g.SetID("original")
 	g.Attr("color", "blue")
 
-	n1 := g.Node("A").Attr("label", "Node A")
-	n2 := g.Node("B").Attr("label", "Node B")
-	n3 := g.Node("C").Attr("label", "Node C")
+	n1 := g.Node("A").SetAttribute("label", "Node A")
+	n2 := g.Node("B").SetAttribute("label", "Node B")
+	n3 := g.Node("C").SetAttribute("label", "Node C")
 
 	e1 := g.Edge(n1, n2).Label("A to B")
-	e1.Attr("weight", 2)
+	e1.SetAttribute("weight", 2)
 
 	sub := g.Subgraph("sub1")
-	sub.Node("D").Attr("label", "Node D")
+	sub.Node("D").SetAttribute("label", "Node D")
 
 	g.AddToSameRank(n1, n2, n3)
 
 	copy := g.DeepCopy()
 
-	if copy.GetID() != g.GetID() {
-		t.Errorf("Expected graph ID %v, got %v", g.GetID(), copy.GetID())
+	if copy.ID() != g.ID() {
+		t.Errorf("Expected graph ID %v, got %v", g.ID(), copy.ID())
 	}
 
 	if copy.Value("color") != g.Value("color") {
@@ -500,8 +500,8 @@ func TestDeepCopy(t *testing.T) {
 		if !exists {
 			t.Errorf("Subgraph %v missing in copied graph", id)
 		}
-		if copiedSubgraph.GetID() != originalSubgraph.GetID() {
-			t.Errorf("Subgraph %v: expected ID %v, got %v", id, originalSubgraph.GetID(), copiedSubgraph.GetID())
+		if copiedSubgraph.ID() != originalSubgraph.ID() {
+			t.Errorf("Subgraph %v: expected ID %v, got %v", id, originalSubgraph.ID(), copiedSubgraph.ID())
 		}
 	}
 

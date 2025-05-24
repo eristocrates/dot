@@ -8,8 +8,8 @@ type Edge struct {
 	fromPort, toPort string
 }
 
-// Attr sets key=value and returns the Edge.
-func (e Edge) Attr(key string, value interface{}) Edge {
+// SetAttribute sets key=value and returns the Edge.
+func (e Edge) SetAttribute(key string, value interface{}) Edge {
 	e.AttributesMap.Attr(key, value)
 	return e
 }
@@ -24,22 +24,22 @@ func (e Edge) Label(value interface{}) Edge {
 // Solid sets the edge attribute "style" to "solid"
 // Default style
 func (e Edge) Solid() Edge {
-	return e.Attr("style", "solid")
+	return e.SetAttribute("style", "solid")
 }
 
 // Bold sets the edge attribute "style" to "bold"
 func (e Edge) Bold() Edge {
-	return e.Attr("style", "bold")
+	return e.SetAttribute("style", "bold")
 }
 
 // Dashed sets the edge attribute "style" to "dashed"
 func (e Edge) Dashed() Edge {
-	return e.Attr("style", "dashed")
+	return e.SetAttribute("style", "dashed")
 }
 
 // Dotted sets the edge attribute "style" to "dotted"
 func (e Edge) Dotted() Edge {
-	return e.Attr("style", "dotted")
+	return e.SetAttribute("style", "dotted")
 }
 
 // Edge returns a new Edge between the "to" node of this Edge and the argument Node.
@@ -57,8 +57,8 @@ func (e Edge) EdgesTo(to Node) []Edge {
 	return e.graph.FindEdges(e.to, to)
 }
 
-// GetAttr returns the value stored by a name. Returns nil if missing.
-func (e Edge) GetAttr(name string) interface{} {
+// Attribute returns the value stored by a name. Returns nil if missing.
+func (e Edge) Attribute(name string) interface{} {
 	return e.attributes[name]
 }
 
@@ -73,6 +73,6 @@ func (e Edge) To() Node {
 }
 
 // Returns a copy of the attributes for this edge.
-func (e Edge) GetAttributes() map[string]interface{} {
-	return e.AttributesMap.GetAttributes()
+func (e Edge) Attributes() map[string]interface{} {
+	return e.AttributesMap.Attributes()
 }

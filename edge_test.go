@@ -44,9 +44,9 @@ func TestEdgeStyleHelpers(t *testing.T) {
 func TestEdgeWithTwoPorts(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("A")
-	n1.Attr("label", HTML("<table><tr><td port='port_a'>A</td></tr></table>"))
+	n1.SetAttribute("label", HTML("<table><tr><td port='port_a'>A</td></tr></table>"))
 	n2 := di.Node("B")
-	n2.Attr("label", HTML("<table><tr><td port='port_b'>B</td></tr></table>"))
+	n2.SetAttribute("label", HTML("<table><tr><td port='port_b'>B</td></tr></table>"))
 	di.EdgeWithPorts(n1, n2, "port_a", "port_b")
 
 	want := "digraph  {n1[label=<<table><tr><td port='port_a'>A</td></tr></table>>];n2[label=<<table><tr><td port='port_b'>B</td></tr></table>>];n1:port_a->n2:port_b;}"
@@ -58,9 +58,9 @@ func TestEdgeWithTwoPorts(t *testing.T) {
 func TestEdgeWithNoPorts(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("A")
-	n1.Attr("label", HTML("<table><tr><td>A</td></tr></table>"))
+	n1.SetAttribute("label", HTML("<table><tr><td>A</td></tr></table>"))
 	n2 := di.Node("B")
-	n2.Attr("label", HTML("<table><tr><td>B</td></tr></table>"))
+	n2.SetAttribute("label", HTML("<table><tr><td>B</td></tr></table>"))
 	di.EdgeWithPorts(n1, n2, "", "")
 
 	want := "digraph  {n1[label=<<table><tr><td>A</td></tr></table>>];n2[label=<<table><tr><td>B</td></tr></table>>];n1->n2;}"
@@ -72,9 +72,9 @@ func TestEdgeWithNoPorts(t *testing.T) {
 func TestEdgeWithFirstPort(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("A")
-	n1.Attr("label", HTML("<table><tr><td port='port_a'>A</td></tr></table>"))
+	n1.SetAttribute("label", HTML("<table><tr><td port='port_a'>A</td></tr></table>"))
 	n2 := di.Node("B")
-	n2.Attr("label", HTML("<table><tr><td>B</td></tr></table>"))
+	n2.SetAttribute("label", HTML("<table><tr><td>B</td></tr></table>"))
 	di.EdgeWithPorts(n1, n2, "port_a", "")
 
 	want := "digraph  {n1[label=<<table><tr><td port='port_a'>A</td></tr></table>>];n2[label=<<table><tr><td>B</td></tr></table>>];n1:port_a->n2;}"
@@ -86,9 +86,9 @@ func TestEdgeWithFirstPort(t *testing.T) {
 func TestEdgeWithSecondPort(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("A")
-	n1.Attr("label", HTML("<table><tr><td>A</td></tr></table>"))
+	n1.SetAttribute("label", HTML("<table><tr><td>A</td></tr></table>"))
 	n2 := di.Node("B")
-	n2.Attr("label", HTML("<table><tr><td port='port_b'>B</td></tr></table>"))
+	n2.SetAttribute("label", HTML("<table><tr><td port='port_b'>B</td></tr></table>"))
 	di.EdgeWithPorts(n1, n2, "", "port_b")
 
 	want := "digraph  {n1[label=<<table><tr><td>A</td></tr></table>>];n2[label=<<table><tr><td port='port_b'>B</td></tr></table>>];n1->n2:port_b;}"
@@ -114,18 +114,18 @@ func TestEdgeSetLabel(t *testing.T) {
 
 func TestNonStringAttribute(t *testing.T) {
 	di := NewGraph(Directed)
-	di.Node("A").Attr("shoesize", 42)
+	di.Node("A").SetAttribute("shoesize", 42)
 	if got, want := flatten(di.String()), `digraph  {n1[label="A",shoesize="42"];}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
 
-func TestEdgeGetAttributes(t *testing.T) {
+func TestEdgeAttributes(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("A")
 	n2 := di.Node("B")
-	e := di.Edge(n1, n2).Label("edge-label").Attr("foo", "bar")
-	attrs := e.GetAttributes()
+	e := di.Edge(n1, n2).Label("edge-label").SetAttribute("foo", "bar")
+	attrs := e.Attributes()
 	if v, ok := attrs["label"]; !ok || v != "edge-label" {
 		t.Errorf("expected label=edge-label, got %v", attrs)
 	}

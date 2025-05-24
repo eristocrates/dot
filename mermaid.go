@@ -79,7 +79,7 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 	for _, key := range g.sortedNodesKeys() {
 		nodeShape := MermaidShapeRound
 		each := g.nodes[key]
-		if s := each.GetAttr("shape"); s != nil {
+		if s := each.Attribute("shape"); s != nil {
 			// could be a shape or a string
 			shapeString, ok := s.(string)
 			if ok {
@@ -96,7 +96,7 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 			}
 		}
 		txt := "?"
-		if label := each.GetAttr("label"); label != nil {
+		if label := each.Attribute("label"); label != nil {
 			// take string only
 			slabel, ok := label.(string)
 			if ok {
@@ -104,7 +104,7 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 			}
 		}
 		fmt.Fprintf(sb, "\tn%d%s%s%s;\n", each.seq, nodeShape.open, escape(txt), nodeShape.close)
-		if style := each.GetAttr("style"); style != nil {
+		if style := each.Attribute("style"); style != nil {
 			fmt.Fprintf(sb, "\tstyle n%d %s\n", each.seq, style.(string))
 		}
 	}
@@ -119,14 +119,14 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 		for _, each := range all {
 			// The edge can override the link style
 			link := denoteEdge
-			if l := each.GetAttr("link"); l != nil {
+			if l := each.Attribute("link"); l != nil {
 				// take string only
 				slink, ok := l.(string)
 				if ok {
 					link = slink
 				}
 			}
-			if label := each.GetAttr("label"); label != nil {
+			if label := each.Attribute("label"); label != nil {
 				slabel, ok := label.(string)
 				if !ok {
 					// make it a string

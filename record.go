@@ -107,8 +107,8 @@ func (r *recordBuilder) Nesting(block func()) {
 
 // Build sets the computed label and shape
 func (r *recordBuilder) Build() error {
-	r.target.Attr("shape", r.shape)
-	r.target.Attr("label", r.Label())
+	r.target.SetAttribute("shape", r.shape)
+	r.target.SetAttribute("label", r.Label())
 	return nil
 }
 

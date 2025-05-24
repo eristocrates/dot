@@ -14,7 +14,7 @@ type compositeGraphKind int
 
 // Connectable is a dot.Node or a *dotx.Composite
 type Connectable interface {
-	Attr(label string, value interface{}) dot.Node
+	SetAttribute(label string, value interface{}) dot.Node
 }
 
 const (
@@ -44,7 +44,7 @@ func NewComposite(dotPath, id string, g *dot.Graph, kind compositeGraphKind) *Co
 	}
 	sub := &Composite{
 		Graph:      innerGraph,
-		outerNode:  g.Node(id).Attr("shape", "box3d"),
+		outerNode:  g.Node(id).SetAttribute("shape", "box3d"),
 		outerGraph: g,
 		kind:       kind,
 	}
@@ -57,9 +57,9 @@ func (s *Composite) ExportFilename() string {
 	return s.dotFilename
 }
 
-// Attr sets label=value and returns the Node in the graph
-func (s *Composite) Attr(label string, value interface{}) dot.Node {
-	return s.outerNode.Attr(label, value)
+// SetAttribute sets label=value and returns the Node in the graph
+func (s *Composite) SetAttribute(label string, value interface{}) dot.Node {
+	return s.outerNode.SetAttribute(label, value)
 }
 
 // ExportName argument name will be used for the .dot export and the HREF link using svg
@@ -67,7 +67,7 @@ func (s *Composite) Attr(label string, value interface{}) dot.Node {
 func (s *Composite) ExportName(dotPath, name string) {
 	hrefFile := strings.ReplaceAll(name, " ", "_") + ".svg"
 	dotFile := strings.ReplaceAll(name, " ", "_") + ".dot"
-	s.outerNode.Attr("href", hrefFile)
+	s.outerNode.SetAttribute("href", hrefFile)
 	s.dotFilename = dotPath + dotFile
 }
 
@@ -88,7 +88,7 @@ func (s *Composite) Input(id string, from Connectable) dot.Edge {
 		return s.connect(id, true, fromNode)
 	}
 	// ensure input node in innergraph
-	s.Node(id).Attr("shape", "point")
+	s.Node(id).SetAttribute("shape", "point")
 	// edge on outergraph
 	return fromNode.Edge(s.outerNode).Label(id)
 }
@@ -110,19 +110,19 @@ func (s *Composite) Output(id string, to Connectable) dot.Edge {
 		return s.connect(id, false, toNode)
 	}
 	// ensure output node in innergraph
-	s.Node(id).Attr("shape", "point")
+	s.Node(id).SetAttribute("shape", "point")
 	// edge on outergraph
 	return s.outerNode.Edge(toNode).Label(id)
 }
 
 func (s *Composite) connect(portName string, isInput bool, inner dot.Node) dot.Edge {
 	// node creation is idempotent
-	port := s.Node(portName).Attr("shape", "point")
+	port := s.Node(portName).SetAttribute("shape", "point")
 	if isInput {
-		return s.EdgeWithPorts(port, inner, "s", "n").Attr("taillabel", portName)
+		return s.EdgeWithPorts(port, inner, "s", "n").SetAttribute("taillabel", portName)
 	} else {
 		// is output
-		return s.EdgeWithPorts(inner, port, "s", "n").Attr("headlabel", portName)
+		return s.EdgeWithPorts(inner, port, "s", "n").SetAttribute("headlabel", portName)
 	}
 }
 
@@ -244,14 +244,14 @@ func copyAttributes(from interface{}, to interface{}) {
 	switch src := from.(type) {
 	case dot.Node:
 		if dst, ok := to.(dot.Node); ok {
-			for key, value := range src.GetAttributes() {
-				dst.Attr(key, value)
+			for key, value := range src.Attributes() {
+				dst.SetAttribute(key, value)
 			}
 		}
 	case dot.Edge:
 		if dst, ok := to.(dot.Edge); ok {
-			for key, value := range src.GetAttributes() {
-				dst.Attr(key, value)
+			for key, value := range src.Attributes() {
+				dst.SetAttribute(key, value)
 			}
 		}
 	}
@@ -262,7 +262,7 @@ func findChildComposites(comp *Composite) []*Composite {
 
 	// Iterate over all nodes in the composite's inner graph
 	for _, node := range comp.Graph.FindNodes() {
-		attrs := node.GetAttributes()
+		attrs := node.Attributes()
 		href, ok := attrs["href"].(string)
 		if !ok || href == "" {
 			continue

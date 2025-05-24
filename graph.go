@@ -50,13 +50,13 @@ func NewGraph(options ...GraphOption) *Graph {
 	return graph
 }
 
-// GetID returns the identifier of the graph.
-func (g *Graph) GetID() string {
+// ID returns the identifier of the graph.
+func (g *Graph) ID() string {
 	return g.id
 }
 
-// ID sets the identifier of the graph.
-func (g *Graph) ID(newID string) *Graph {
+// SetID sets the identifier of the graph.
+func (g *Graph) SetID(newID string) *Graph {
 	if len(g.id) > 0 {
 		panic("cannot overwrite non-empty id ; both the old and the new could be in use and we cannot tell")
 	}
@@ -228,7 +228,7 @@ func (g *Graph) EdgeWithPorts(fromNode, toNode Node, fromNodePort, toNodePort st
 		e.toPort = toNodePort
 	}
 	if len(labels) > 0 {
-		e.Attr("label", strings.Join(labels, ","))
+		e.SetAttribute("label", strings.Join(labels, ","))
 	}
 	if g.edgeInitializer != nil {
 		g.edgeInitializer(e)
@@ -476,8 +476,8 @@ func (g *Graph) HasNode(n Node) bool {
 	return g == n.graph
 }
 
-// GetAttributes returns a copy of the attributes.
-func (am *AttributesMap) GetAttributes() map[string]interface{} {
+// Attributes returns a copy of the attributes.
+func (am *AttributesMap) Attributes() map[string]interface{} {
 	copyMap := make(map[string]interface{}, len(am.attributes))
 	for k, v := range am.attributes {
 		copyMap[k] = v
@@ -494,12 +494,12 @@ func (g *Graph) DeepCopy() *Graph {
 	copy.seq = g.seq
 	copy.parent = g.parent
 
-	copy.AttributesMap = AttributesMap{attributes: g.GetAttributes()}
+	copy.AttributesMap = AttributesMap{attributes: g.Attributes()}
 
 	copy.nodes = make(map[string]Node, len(g.nodes))
 	for id, node := range g.nodes {
 		copy.nodes[id] = Node{
-			AttributesMap: AttributesMap{attributes: node.GetAttributes()},
+			AttributesMap: AttributesMap{attributes: node.Attributes()},
 			graph:         copy,
 			id:            node.id,
 			seq:           node.seq,
@@ -511,7 +511,7 @@ func (g *Graph) DeepCopy() *Graph {
 		newEdges := make([]Edge, len(edges))
 		for i, edge := range edges {
 			newEdges[i] = Edge{
-				AttributesMap: AttributesMap{attributes: edge.GetAttributes()},
+				AttributesMap: AttributesMap{attributes: edge.Attributes()},
 				graph:         copy,
 				from:          copy.nodes[edge.from.id],
 				to:            copy.nodes[edge.to.id],

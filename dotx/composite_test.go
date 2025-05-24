@@ -68,7 +68,7 @@ func TestExampleSubsystemExternalGraph(t *testing.T) {
 
 func TestAttrOnSubsystem(t *testing.T) {
 	s := NewComposite("testing", "test", dot.NewGraph(), SameGraph)
-	s.Attr("shape", "box3d")
+	s.SetAttribute("shape", "box3d")
 	if !strings.Contains(s.String(), "test") { // dont care about structure, dot has tested that
 		t.Fail()
 	}
