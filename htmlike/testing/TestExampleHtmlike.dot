@@ -1,0 +1,33 @@
+digraph  {
+	subgraph s5 {
+		label="";
+		{rank=same; n2;n3;};
+		
+	}
+	rankdir="LR";
+	n1[label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+<TR><TD BGCOLOR="yellow" ROWSPAN="3">class</TD></TR>
+<TR><TD BGCOLOR="lightblue" PORT="here">qualifier</TD></TR>
+</TABLE>>,shape="plaintext"];
+	n2[label=<
+<TABLE BGCOLOR="bisque">
+<TR><TD COLSPAN="3">elephant</TD><TD ALIGN="RIGHT" BGCOLOR="chartreuse" ROWSPAN="2" VALIGN="BOTTOM">two</TD></TR>
+<TR><TD COLSPAN="2" ROWSPAN="2">
+<TABLE BGCOLOR="grey">
+<TR><TD>corn</TD></TR>
+<TR><TD BGCOLOR="yellow">c</TD></TR>
+<TR><TD>f</TD></TR>
+</TABLE></TD><TD BGCOLOR="white">penguin</TD></TR>
+<TR><TD ALIGN="RIGHT" BORDER="4" COLSPAN="2" PORT="there">4</TD></TR>
+</TABLE>>,shape="ellipse",style="filled"];
+	n3[label=<long line 1<BR/>line 2<BR ALIGN="LEFT"/>line 3<BR ALIGN="RIGHT"/>>,shape="plaintext"];
+	n4[label="d",shape="triangle"];
+	n1:here->n2:there[arrowtail="diamond",dir="both"];
+	n3->n2;
+	n4->n3[label=<
+<TABLE>
+<TR><TD BGCOLOR="red" WIDTH="10"> </TD><TD>Edge labels<BR/>also</TD><TD BGCOLOR="blue" WIDTH="10"> </TD></TR>
+</TABLE>>];
+	
+}
