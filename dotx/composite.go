@@ -154,10 +154,14 @@ func (s *Composite) Export(build func(g *dot.Graph)) *Composite {
 	return s
 }
 
+func (c *Composite) OuterNode() *dot.Node {
+	return &c.outerNode
+}
+
 // ConvertExternalToSameGraph takes a root composite and converts it to same-graph format
-func ConvertExternalToSameGraph(root *Composite, newGraph *dot.Graph) *dot.Graph {
+func ConvertExternalToSameGraph(root *Composite) *dot.Graph {
 	// Create new root graph
-	// newGraph := dot.NewGraph(dot.Directed)
+	newGraph := dot.NewGraph(dot.Directed)
 
 	// Create a mapping of original nodes to new nodes
 	nodeMap := make(map[string]dot.Node)

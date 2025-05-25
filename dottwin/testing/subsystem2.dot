@@ -1,0 +1,8 @@
+digraph  {
+	
+	n1[label="in3",shape="point"];
+	n2[label="out3",shape="point"];
+	n3[label="subcomponent 3"];
+	n1:s->n3:n[taillabel="in3"];
+	
+}

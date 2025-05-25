@@ -59,3 +59,7 @@ func (n Node) BidirectionalEdge(toAndFromNode Node) []Edge {
 func (n Node) NewRecordBuilder() *recordBuilder {
 	return newRecordBuilder(n)
 }
+
+func (n Node) Graph() *Graph {
+	return n.graph
+}
